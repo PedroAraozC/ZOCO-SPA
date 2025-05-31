@@ -10,9 +10,8 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = !!token;
 
   const login = async (email, password) => {
-    // Simulación de login API
 
-    const foundUser = mockUsers.find((user) => user.email === email);
+    const foundUser = mockUsers.find((user) => user.email === email && user.password === password);
     console.log(foundUser);
     if (!foundUser) {
       return false;

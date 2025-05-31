@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Table, Button, Modal, Form } from 'react-bootstrap';
-import UserDataForm from '../../UserDataForm';
 import { getUserData, saveUserData, mockUsers } from '../../mockService';
+import UserDataForm from './UserDataForm';
 
 function AdminUserDataManager() {
   const [selectedUserId, setSelectedUserId] = useState(null);

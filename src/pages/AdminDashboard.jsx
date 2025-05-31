@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Container, Table, Button } from 'react-bootstrap';
+import AdminUserDataManager from '../components/AdminUserDataManager';
+import { mockUsers } from '../../mockService';
 
 function AdminDashboard() {
   const { user, logout } = useAuth();
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    // Simulación de API
-    setUsers([
-      { id: 1, name: 'Alice', email: 'alice@test.com' },
-      { id: 2, name: 'Bob', email: 'bob@test.com' },
-    ]);
+    setUsers(mockUsers);
   }, []);
 
   return (
@@ -38,6 +36,7 @@ function AdminDashboard() {
           ))}
         </tbody>
       </Table>
+      <Button>+</Button>
       <AdminUserDataManager />
       <Button variant="danger" onClick={logout} className="mt-3">Cerrar sesión</Button>
     </Container>
