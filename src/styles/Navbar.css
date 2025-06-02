@@ -1,0 +1,10 @@
+.navbar{
+    width: 100dvw;
+    height: 10vh;
+    font-weight: 700;
+    font-size: x-large;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-around;
+    padding: auto;
+}

@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Container, Form, Button, InputGroup } from "react-bootstrap";
+import {
+  Container,
+  Form,
+  Button,
+  InputGroup,
+  FloatingLabel,
+} from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import "../styles/LoginPage.css"; // Import your custom styles
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -23,44 +30,50 @@ function LoginPage() {
   };
 
   return (
-    <Container className="mt-5" style={{ maxWidth: "400px" }}>
-      <h2 className="mb-4">Login</h2>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="formEmail" className="mb-3">
-          <Form.Label>Email</Form.Label>
+    <Container className="p-5" style={{ maxWidth: "400px" }}>
+      <Form onSubmit={handleSubmit} className="loginContainer">
+        <h2 className="mb-4">Login</h2>
+        <FloatingLabel
+          controlId="floatingInput"
+          label="Email "
+          className="mb-3"
+        >
           <Form.Control
             type="email"
+            placeholder=""
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </Form.Group>
+        </FloatingLabel>
 
-       <Form.Group controlId="formPassword" className="mb-3" style={{ position: "relative" }}>
-          <Form.Label>Contraseña</Form.Label>
-          <Form.Control
-            type={showPassword ? "text" : "password"}
-            placeholder="*******"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <span
-            onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: "absolute",
-              top: "70%",
-              right: "10px",
-              transform: "translateY(-50%)",
-              cursor: "pointer",
-              color: "#6c757d",
-            }}
+        <Form.Group
+          controlId="formPassword"
+          className="mb-3 floating-label"
+          style={{ position: "relative" }}
+        >
+          <FloatingLabel
+            controlId="floatingInput"
+            label="Password"
+            className="mb-3 "
           >
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
+            <Form.Control
+              type={showPassword ? "text" : "password"}
+              placeholder=""
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <span
+              className="password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </FloatingLabel>
         </Form.Group>
 
-        <Button variant="primary" type="submit" className="w-100">
+        <Button variant="primary" type="submit" className="login-button">
           Iniciar sesión
         </Button>
       </Form>

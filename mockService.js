@@ -16,7 +16,9 @@ export const mockDataByUser = {
 export function getUserData(userId) {
   return mockDataByUser[userId] || [];
 }
-
+export function getUserInfo(userId) {
+  return mockUsers.find(user => user.id === userId) || null;
+}
 export function saveUserData(userId, newData) {
   const list = mockDataByUser[userId] || [];
   mockDataByUser[userId] = [...list, { ...newData, id: Date.now().toString() }];
