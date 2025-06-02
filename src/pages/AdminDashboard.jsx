@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Container, Table, Button } from 'react-bootstrap';
 import AdminUserDataManager from '../components/AdminUserDataManager';
 import { mockUsers } from '../../mockService';
-import Card from '../components/Card';
+import CardProfile from '../components/CardProfile';
 
 function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -15,7 +15,7 @@ function AdminDashboard() {
 
   return (
     <Container className="mt-5">
-      <Card/>
+      <CardProfile/>
       <h2 className='text-dark'>Panel Admin - Usuarios</h2>
       <Table striped bordered hover className="mt-3">
         <thead>

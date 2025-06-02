@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
 
     const foundUser = mockUsers.find((user) => user.email === email && user.password === password);
-    console.log(foundUser);
     if (!foundUser) {
       return false;
     }
