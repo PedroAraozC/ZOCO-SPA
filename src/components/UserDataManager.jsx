@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { Container, Table, Button, Badge, Card, Row, Col, Alert } from "react-bootstrap";
 import UserDataForm from "./UserDataForm";
 import { getUserData, saveUserData, deleteUserData, getDataDescription } from "../../mockService";
-import { FaPlus, FaEdit, FaTrash, FaGraduationCap, FaMapMarkerAlt, FaUser, FaRefresh } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaGraduationCap, FaMapMarkerAlt, FaUser, FaRedo } from "react-icons/fa";
 import "../styles/UserDataManager.css";
 
 function UserDataManager() {
@@ -244,7 +244,7 @@ function UserDataManager() {
                   disabled={loading}
                   className="refresh-button"
                 >
-                  <FaRefresh className={loading ? "fa-spin" : ""} />
+                  <FaRedo className={loading ? "fa-spin" : ""} />
                 </Button>
                 <Button
                   variant="light"

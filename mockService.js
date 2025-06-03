@@ -1,60 +1,8 @@
-export let mockUsers = [
-  {
-    id: 1,
-    name: "Alice",
-    email: "alice@test.com",
-    role: "user",
-    password: "Test01",
-  },
-  {
-    id: 2,
-    name: "Bob",
-    email: "bob@test.com",
-    role: "admin",
-    password: "Test02",
-  },
-];
+import mockData from './mockData.json';
 
-export const mockDataByUser = {
-  1: [
-    {
-      id: "e1",
-      type: "estudio",
-      data: {
-        institution: "Universidad Nacional de Tucumán",
-        degree: "Ingeniería en Sistemas",
-        startDate: "2018-03-01",
-        endDate: "2022-12-15",
-        status: "completado",
-      },
-    },
-    {
-      id: "d1",
-      type: "direccion",
-      data: {
-        street: "Calle Falsa 123, Piso 2",
-        city: "San Miguel de Tucumán",
-        province: "Tucumán",
-        zipCode: "4000",
-        country: "Argentina",
-        addressType: "personal",
-      },
-    },
-  ],
-  2: [
-    {
-      id: "e2",
-      type: "estudio",
-      data: {
-        institution: "Universidad de Buenos Aires",
-        degree: "Medicina",
-        startDate: "2016-03-01",
-        endDate: "2022-12-15",
-        status: "completado",
-      },
-    },
-  ],
-};
+// Cargar datos desde JSON
+let mockUsers = [...mockData.users];
+let mockDataByUser = { ...mockData.userData };
 
 export function getUserData(userId) {
   return mockDataByUser[userId] || [];
@@ -90,9 +38,6 @@ export function saveUserData(userId, newData) {
     list.push(newEntry);
   }
 
-  // Actualizar la referencia para asegurar reactividad
-  mockDataByUser[userId] = [...list];
-  
   console.log('Datos guardados para usuario', userId, newEntry);
   return newEntry;
 }
@@ -103,13 +48,15 @@ export function deleteUserData(userId, dataId) {
   }
   
   const list = mockDataByUser[userId];
-  const filteredList = list.filter((item) => item.id !== dataId);
+  const index = list.findIndex((item) => item.id === dataId);
   
-  // Actualizar la referencia para asegurar reactividad
-  mockDataByUser[userId] = filteredList;
+  if (index !== -1) {
+    list.splice(index, 1);
+    console.log('Dato eliminado para usuario', userId, 'ID:', dataId);
+    return true;
+  }
   
-  console.log('Dato eliminado para usuario', userId, 'ID:', dataId);
-  return true;
+  return false;
 }
 
 export function updateUserProfile(userId, updatedData) {
@@ -121,24 +68,16 @@ export function updateUserProfile(userId, updatedData) {
 
   console.log('Actualizando perfil de usuario:', userId, updatedData);
 
-  // Crear nuevo objeto para asegurar reactividad
-  const updatedUser = {
-    ...mockUsers[userIndex],
-    ...updatedData,
+  // Actualizar directamente el objeto en el array
+  Object.assign(mockUsers[userIndex], updatedData, {
     id: mockUsers[userIndex].id, // Preservar ID original
     password: mockUsers[userIndex].password, // Preservar password original
-  };
+  });
   
-  mockUsers[userIndex] = updatedUser;
-  
-  // Crear nueva referencia del array para asegurar reactividad
-  mockUsers = [...mockUsers];
-  
-  console.log('Usuario actualizado:', updatedUser);
-  return true;
+  console.log('Usuario actualizado:', mockUsers[userIndex]);
+  return mockUsers[userIndex];
 }
 
-// Nueva función para crear un usuario
 export function createUser(userData) {
   const newId = Math.max(...mockUsers.map(u => u.id), 0) + 1;
   const newUser = {
@@ -150,7 +89,6 @@ export function createUser(userData) {
   };
   
   mockUsers.push(newUser);
-  mockUsers = [...mockUsers]; // Crear nueva referencia
   
   // Inicializar datos vacíos para el nuevo usuario
   mockDataByUser[newId] = [];
@@ -159,7 +97,6 @@ export function createUser(userData) {
   return newUser;
 }
 
-// Nueva función para eliminar un usuario
 export function deleteUser(userId) {
   const userIndex = mockUsers.findIndex((user) => user.id === userId);
   if (userIndex === -1) {
@@ -168,7 +105,6 @@ export function deleteUser(userId) {
   
   // Eliminar usuario del array
   mockUsers.splice(userIndex, 1);
-  mockUsers = [...mockUsers]; // Crear nueva referencia
   
   // Eliminar datos asociados al usuario
   delete mockDataByUser[userId];
@@ -186,12 +122,10 @@ export function getDataDescription(item) {
   return item.value || "Sin descripción";
 }
 
-// Función utilitaria para obtener todos los usuarios
 export function getAllUsers() {
   return [...mockUsers];
 }
 
-// Función utilitaria para obtener estadísticas
 export function getUserStats() {
   return {
     totalUsers: mockUsers.length,
@@ -200,7 +134,6 @@ export function getUserStats() {
   };
 }
 
-// Función para validar integridad de datos
 export function validateDataIntegrity() {
   const issues = [];
   
@@ -213,4 +146,11 @@ export function validateDataIntegrity() {
   });
   
   return issues;
+}
+
+// Función para resetear datos desde JSON
+export function resetToInitialData() {
+  mockUsers = [...mockData.users];
+  mockDataByUser = { ...mockData.userData };
+  console.log('Datos reseteados a valores iniciales del JSON');
 }

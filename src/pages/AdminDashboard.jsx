@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Button, Modal, Form, Badge, Alert } from 'react-bootstrap';
 import { getUserData, saveUserData, deleteUserData, getAllUsers, getDataDescription } from '../../mockService';
-import UserDataForm from './UserDataForm';
-import { FaEdit, FaTrash, FaPlus, FaGraduationCap, FaMapMarkerAlt, FaRefresh } from 'react-icons/fa';
+import UserDataForm from "../components/UserDataForm";
+import { FaEdit, FaTrash, FaPlus, FaGraduationCap, FaMapMarkerAlt, FaRedo } from 'react-icons/fa';
 
 function AdminUserDataManager() {
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -181,7 +181,7 @@ function AdminUserDataManager() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h4>Gestión de Datos por Usuario (Admin)</h4>
         <Button variant="outline-secondary" size="sm" onClick={handleRefresh}>
-          <FaRefresh className={loading ? "fa-spin" : ""} />
+          <FaRedo className={loading ? "fa-spin" : ""} />
         </Button>
       </div>
 

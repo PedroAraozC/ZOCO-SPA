@@ -1,0 +1,58 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Alice",
+      "email": "alice@test.com",
+      "role": "user",
+      "password": "Test01"
+    },
+    {
+      "id": 2,
+      "name": "Bob",
+      "email": "bob@test.com",
+      "role": "admin",
+      "password": "Test02"
+    }
+  ],
+  "userData": {
+    "1": [
+      {
+        "id": "e1",
+        "type": "estudio",
+        "data": {
+          "institution": "Universidad Nacional de Tucumán",
+          "degree": "Ingeniería en Sistemas",
+          "startDate": "2018-03-01",
+          "endDate": "2022-12-15",
+          "status": "completado"
+        }
+      },
+      {
+        "id": "d1",
+        "type": "direccion",
+        "data": {
+          "street": "Calle Falsa 123, Piso 2",
+          "city": "San Miguel de Tucumán",
+          "province": "Tucumán",
+          "zipCode": "4000",
+          "country": "Argentina",
+          "addressType": "personal"
+        }
+      }
+    ],
+    "2": [
+      {
+        "id": "e2",
+        "type": "estudio",
+        "data": {
+          "institution": "Universidad de Buenos Aires",
+          "degree": "Medicina",
+          "startDate": "2016-03-01",
+          "endDate": "2022-12-15",
+          "status": "completado"
+        }
+      }
+    ]
+  }
+}
