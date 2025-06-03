@@ -1,0 +1,196 @@
+/* UserDataManager Styles */
+
+.user-data-container {
+    max-width: 1000px;
+}
+
+.user-data-card {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: 0;
+}
+
+.user-data-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 0;
+    padding: 2rem 1.5rem;
+}
+
+.user-data-title {
+    margin-bottom: 0;
+    font-weight: bold;
+}
+
+.user-data-subtitle {
+    margin-bottom: 0;
+    opacity: 0.75;
+}
+
+.add-button {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.empty-state-icon {
+    margin-bottom: 1.5rem;
+    color: #6c757d;
+    opacity: 0.5;
+}
+
+.empty-state-title {
+    color: #6c757d;
+}
+
+.empty-state-text {
+    color: #6c757d;
+}
+
+.add-info-button {
+    margin-top: 1rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.data-table-container {
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.data-table {
+    margin-bottom: 0;
+}
+
+.data-table thead th {
+    border: 0;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.data-table tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.05);
+}
+
+.data-table tbody td {
+    padding: 1.5rem;
+    vertical-align: middle;
+}
+
+.data-table .type-column {
+    padding-left: 1.5rem;
+}
+
+.data-table .actions-column {
+    width: 200px !important;
+    text-align: center;
+}
+
+.type-badge {
+    padding: 0.5rem 0.75rem;
+}
+
+.detailed-description .degree-title,
+.detailed-description .address-title {
+    font-weight: bold;
+    color: #212529;
+}
+
+.detailed-description .institution-info,
+.detailed-description .location-info {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.detailed-description .status-badge {
+    margin-top: 0.25rem;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.action-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.stats-row {
+    margin-top: 1.5rem;
+}
+
+.stats-card {
+    border: 0;
+}
+
+.stats-card.estudios {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.stats-card.direcciones {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.stats-card-body {
+    text-align: center;
+}
+
+.stats-icon {
+    margin-bottom: 0.5rem;
+}
+
+.stats-number {
+    margin-bottom: 0;
+}
+
+.stats-label {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.loading-container {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .user-data-header {
+        padding: 1.5rem 1rem;
+    }
+
+    .add-button {
+        width: 50px;
+        height: 50px;
+    }
+
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+}

@@ -1,33 +1,85 @@
-import React, { use, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import "../styles/Card.css"; // Assuming you have a CSS file for styling
-import profile from "../assets/placeholder.jpg"; // Adjust the path as necessary
+import "../styles/Card.css";
+import profile from "../assets/placeholder.jpg";
 import { FaPencil } from "react-icons/fa6";
 import { FaSave, FaTimes } from "react-icons/fa";
-import { updateUserProfile } from "../../mockService";
+import { updateUserProfile, getUserInfo } from "../../mockService";
 
 const CardProfile = () => {
-  const { user, logout } = useAuth();
+  const { user, updateUserContext } = useAuth(); // Necesitas agregar updateUserContext al contexto
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({
-    name: user.name,
-    email: user.email,
-    role: user.role,
+    name: user?.name || '',
+    email: user?.email || '',
+    role: user?.role || '',
   });
+  const [loading, setSaving] = useState(false);
+
+  // Sincronizar el estado local cuando el usuario cambie
+  useEffect(() => {
+    if (user) {
+      setEditedUser({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      });
+    }
+  }, [user]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedUser((prev) => ({ ...prev, [name]: value }));
   };
-  const handleSave = () => {
-    updateUserProfile(user.id, editedUser);
-    console.log("Guardado:", editedUser);
-    setIsEditing(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      // Actualizar en mockUsers
+      const success = updateUserProfile(user.id, editedUser);
+      
+      if (success) {
+        // Obtener los datos actualizados
+        const updatedUser = getUserInfo(user.id);
+        
+        // Actualizar el contexto de autenticación
+        if (updateUserContext && updatedUser) {
+          updateUserContext(updatedUser);
+        }
+        
+        console.log("Perfil actualizado exitosamente:", updatedUser);
+        setIsEditing(false);
+      } else {
+        console.error("Error al actualizar el perfil");
+      }
+    } catch (error) {
+      console.error("Error guardando cambios:", error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
-    setEditedUser({ name: user.name, email: user.email, role: user.role });
+    setEditedUser({ 
+      name: user.name, 
+      email: user.email, 
+      role: user.role 
+    });
     setIsEditing(false);
   };
+
+  // Mostrar loading si no hay usuario
+  if (!user) {
+    return (
+      <div className="card">
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="card">
@@ -36,16 +88,24 @@ const CardProfile = () => {
       ) : (
         <div className="lapiz d-flex gap-2">
           <FaSave
-            onClick={() => handleSave()}
-            style={{ cursor: "pointer", color: "#2563eb" }}
+            onClick={handleSave}
+            style={{ 
+              cursor: loading ? "not-allowed" : "pointer", 
+              color: loading ? "#ccc" : "#2563eb",
+              opacity: loading ? 0.6 : 1
+            }}
           />
           <FaTimes
-            onClick={() => handleCancel()}
-            style={{ cursor: "pointer", color: "#2563eb" }}
+            onClick={() => !loading && handleCancel()}
+            style={{ 
+              cursor: loading ? "not-allowed" : "pointer", 
+              color: loading ? "#ccc" : "#2563eb",
+              opacity: loading ? 0.6 : 1
+            }}
           />
         </div>
       )}
-      <div className=" imgPerfil">
+      <div className="imgPerfil">
         <img src={profile} alt="Profile" />
         {!isEditing ? (
           <p className="text-center fs-4 mb-0">{user.name}</p>
@@ -56,9 +116,11 @@ const CardProfile = () => {
             value={editedUser.name}
             onChange={handleChange}
             className="form-control inputName"
+            disabled={loading}
+            placeholder="Nombre completo"
           />
         )}
-        <p className="text-muted ">{user.role}</p>
+        <p className="text-muted">{user.role}</p>
       </div>
       <div className="d-flex flex-row justify-content-between align-items-center">
         <p>Email</p>
@@ -71,13 +133,17 @@ const CardProfile = () => {
             value={editedUser.email}
             onChange={handleChange}
             className="form-control mt-0 inputEmail"
+            disabled={loading}
+            placeholder="email@ejemplo.com"
           />
         )}
       </div>
-      {/* <div className="d-flex flex-row justify-content-between align-items-center">
-        <p>Rol</p>
-        <p>{user.role}</p>
-      </div> */}
+      
+      {loading && (
+        <div className="text-center mt-2">
+          <small className="text-muted">Guardando cambios...</small>
+        </div>
+      )}
     </div>
   );
 };
