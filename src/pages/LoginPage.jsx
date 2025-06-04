@@ -20,12 +20,12 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await login(email, password);
-    console.log(success);
-    if (success) {
+    const result = await login({ email, password });
+
+    if (result.success) {
       navigate("/dashboard");
     } else {
-      alert("Usuario o contraseña incorrectos");
+      alert(result.message || "Usuario o contraseña incorrectos");
     }
   };
 

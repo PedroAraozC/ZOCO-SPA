@@ -36,11 +36,6 @@ function UserDataManager() {
     loadData();
   }, [loadData]);
 
-  // Función para refrescar datos manualmente
-  const handleRefresh = () => {
-    loadData();
-  };
-
   const handleAdd = () => {
     setSelected({ type: "estudio" }); // Valor por defecto
     setShowModal(true);
@@ -237,15 +232,7 @@ function UserDataManager() {
             </Col>
             <Col xs="auto">
               <div className="d-flex gap-2">
-                <Button
-                  variant="outline-secondary"
-                  size="sm"
-                  onClick={handleRefresh}
-                  disabled={loading}
-                  className="refresh-button"
-                >
-                  <FaRedo className={loading ? "fa-spin" : ""} />
-                </Button>
+
                 <Button
                   variant="light"
                   className="add-button"

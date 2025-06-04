@@ -1,0 +1,33 @@
+body.modal-open {
+    padding-right: 0 !important;
+}
+
+@media (max-width: 991px) {
+
+    .user-data-section .user-data-card,
+    .user-data-cards-container .card {
+        width: fit-content;
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+}
+
+.user-list-section .user-card {
+    transition: all 0.2s ease;
+}
+
+.user-list-section .user-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-list-section .user-card.border-primary {
+    border-width: 2px !important;
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}

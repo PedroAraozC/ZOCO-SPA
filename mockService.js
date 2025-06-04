@@ -1,9 +1,33 @@
 import mockData from './mockData.json';
 
-// Cargar datos desde JSON
-let mockUsers = [...mockData.users];
-let mockDataByUser = { ...mockData.userData };
+const STORAGE_KEY_USERS = 'mockUsers';
+const STORAGE_KEY_USER_DATA = 'mockUserData';
 
+function loadFromSessionStorage(key, fallback) {
+  const stored = sessionStorage.getItem(key);
+  return stored ? JSON.parse(stored) : fallback;
+}
+
+function saveToSessionStorage(key, data) {
+  sessionStorage.setItem(key, JSON.stringify(data));
+}
+
+// Inicialización
+let mockUsers = loadFromSessionStorage(STORAGE_KEY_USERS, [...mockData.users]);
+let mockDataByUser = loadFromSessionStorage(STORAGE_KEY_USER_DATA, { ...mockData.userData });
+
+function persist() {
+  saveToSessionStorage(STORAGE_KEY_USERS, mockUsers);
+  saveToSessionStorage(STORAGE_KEY_USER_DATA, mockDataByUser);
+}
+
+// ========== FUNCIONES DE AUTENTICACIÓN ==========
+export function loginUser(email, password) {
+  const users = getAllUsers();
+  return users.find(u => u.email === email && u.password === password) || null;
+}
+
+// ========== FUNCIONES DE DATOS ==========
 export function getUserData(userId) {
   return mockDataByUser[userId] || [];
 }
@@ -13,68 +37,52 @@ export function getUserInfo(userId) {
 }
 
 export function saveUserData(userId, newData) {
-  // Asegurar que el usuario existe en mockDataByUser
   if (!mockDataByUser[userId]) {
     mockDataByUser[userId] = [];
   }
-  
+
   const list = mockDataByUser[userId];
   const newEntry = {
     ...newData,
-    id: newData.id || `${newData.type.substring(0, 1)}${Date.now()}`,
+    id: newData.id || `${newData.type[0]}${Date.now()}`
   };
 
-  if (newData.id) {
-    // Actualizar entrada existente
-    const index = list.findIndex((item) => item.id === newData.id);
-    if (index !== -1) {
-      list[index] = newEntry;
-    } else {
-      // Si no existe, agregar como nueva entrada
-      list.push(newEntry);
-    }
+  const index = list.findIndex((item) => item.id === newData.id);
+
+  if (index !== -1) {
+    list[index] = newEntry;
   } else {
-    // Agregar nueva entrada
     list.push(newEntry);
   }
 
-  console.log('Datos guardados para usuario', userId, newEntry);
+  persist();
   return newEntry;
 }
 
 export function deleteUserData(userId, dataId) {
-  if (!mockDataByUser[userId]) {
-    return false;
-  }
-  
+  if (!mockDataByUser[userId]) return false;
+
   const list = mockDataByUser[userId];
   const index = list.findIndex((item) => item.id === dataId);
-  
   if (index !== -1) {
     list.splice(index, 1);
-    console.log('Dato eliminado para usuario', userId, 'ID:', dataId);
+    persist();
     return true;
   }
-  
+
   return false;
 }
 
 export function updateUserProfile(userId, updatedData) {
   const userIndex = mockUsers.findIndex((user) => user.id === userId);
-  if (userIndex === -1) {
-    console.error('Usuario no encontrado:', userId);
-    return false;
-  }
+  if (userIndex === -1) return false;
 
-  console.log('Actualizando perfil de usuario:', userId, updatedData);
-
-  // Actualizar directamente el objeto en el array
   Object.assign(mockUsers[userIndex], updatedData, {
-    id: mockUsers[userIndex].id, // Preservar ID original
-    password: mockUsers[userIndex].password, // Preservar password original
+    id: mockUsers[userIndex].id,
+    password: mockUsers[userIndex].password,
   });
-  
-  console.log('Usuario actualizado:', mockUsers[userIndex]);
+
+  persist();
   return mockUsers[userIndex];
 }
 
@@ -87,29 +95,22 @@ export function createUser(userData) {
     role: userData.role || 'user',
     password: userData.password || 'default123',
   };
-  
+
   mockUsers.push(newUser);
-  
-  // Inicializar datos vacíos para el nuevo usuario
   mockDataByUser[newId] = [];
-  
-  console.log('Nuevo usuario creado:', newUser);
+
+  persist();
   return newUser;
 }
 
 export function deleteUser(userId) {
   const userIndex = mockUsers.findIndex((user) => user.id === userId);
-  if (userIndex === -1) {
-    return false;
-  }
-  
-  // Eliminar usuario del array
+  if (userIndex === -1) return false;
+
   mockUsers.splice(userIndex, 1);
-  
-  // Eliminar datos asociados al usuario
   delete mockDataByUser[userId];
-  
-  console.log('Usuario eliminado:', userId);
+
+  persist();
   return true;
 }
 
@@ -136,21 +137,17 @@ export function getUserStats() {
 
 export function validateDataIntegrity() {
   const issues = [];
-  
-  // Verificar que todos los usuarios en mockDataByUser existen en mockUsers
   Object.keys(mockDataByUser).forEach(userId => {
     const userExists = mockUsers.some(user => user.id === parseInt(userId));
     if (!userExists) {
       issues.push(`Datos encontrados para usuario inexistente: ${userId}`);
     }
   });
-  
   return issues;
 }
 
-// Función para resetear datos desde JSON
 export function resetToInitialData() {
   mockUsers = [...mockData.users];
   mockDataByUser = { ...mockData.userData };
-  console.log('Datos reseteados a valores iniciales del JSON');
+  persist();
 }
