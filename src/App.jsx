@@ -14,7 +14,7 @@ import Layout from "./common/Layout";
 
 const PrivateRoute = ({ children, role }) => {
   const { isAuthenticated, role: userRole } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login" />;
+  if (!isAuthenticated) return <Navigate to="/" />;
   if (role && role !== userRole) return <Navigate to="/dashboard" />;
   return children;
 };
@@ -34,7 +34,7 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/" element={<LoginPage />} />
       <Route
         path="/dashboard"
         element={

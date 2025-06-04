@@ -2,19 +2,22 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Card.css";
 import profile from "../assets/placeholder.jpg";
-import { FaPencil } from "react-icons/fa6";
+import { FaEye, FaEyeSlash, FaPencil } from "react-icons/fa6";
 import { FaSave, FaTimes } from "react-icons/fa";
 import { updateUserProfile, getUserInfo } from "../../mockService";
+import { Form, FormControl } from "react-bootstrap";
 
 const CardProfile = () => {
   const { user, updateUserContext } = useAuth(); // Necesitas agregar updateUserContext al contexto
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    role: user?.role || '',
+    name: user?.name || "",
+    email: user?.email || "",
+    password: user?.password || "",
+    role: user?.role || "",
   });
   const [loading, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Sincronizar el estado local cuando el usuario cambie
   useEffect(() => {
@@ -22,6 +25,7 @@ const CardProfile = () => {
       setEditedUser({
         name: user.name,
         email: user.email,
+        password: user.password,
         role: user.role,
       });
     }
@@ -37,16 +41,16 @@ const CardProfile = () => {
     try {
       // Actualizar en mockUsers
       const success = updateUserProfile(user.id, editedUser);
-      
+
       if (success) {
         // Obtener los datos actualizados
         const updatedUser = getUserInfo(user.id);
-        
+
         // Actualizar el contexto de autenticación
         if (updateUserContext && updatedUser) {
           updateUserContext(updatedUser);
         }
-        
+
         console.log("Perfil actualizado exitosamente:", updatedUser);
         setIsEditing(false);
       } else {
@@ -60,10 +64,11 @@ const CardProfile = () => {
   };
 
   const handleCancel = () => {
-    setEditedUser({ 
-      name: user.name, 
-      email: user.email, 
-      role: user.role 
+    setEditedUser({
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      role: user.role,
     });
     setIsEditing(false);
   };
@@ -89,18 +94,18 @@ const CardProfile = () => {
         <div className="lapiz d-flex gap-2">
           <FaSave
             onClick={handleSave}
-            style={{ 
-              cursor: loading ? "not-allowed" : "pointer", 
+            style={{
+              cursor: loading ? "not-allowed" : "pointer",
               color: loading ? "#ccc" : "#2563eb",
-              opacity: loading ? 0.6 : 1
+              opacity: loading ? 0.6 : 1,
             }}
           />
           <FaTimes
             onClick={() => !loading && handleCancel()}
-            style={{ 
-              cursor: loading ? "not-allowed" : "pointer", 
+            style={{
+              cursor: loading ? "not-allowed" : "pointer",
               color: loading ? "#ccc" : "#2563eb",
-              opacity: loading ? 0.6 : 1
+              opacity: loading ? 0.6 : 1,
             }}
           />
         </div>
@@ -138,7 +143,48 @@ const CardProfile = () => {
           />
         )}
       </div>
-      
+      <div className="d-flex flex-row justify-content-between align-items-center">
+        <p>Password</p>
+        {!isEditing ? (
+          <p>*********</p>
+        ) : (
+          <div
+            className="position-relative "
+            style={{
+              width: "60%",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Form.Control
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={editedUser.password ?? ""}
+              onChange={handleChange}
+              className="form-control mt-0 inputPassword pe-5"
+              disabled={loading}
+              placeholder="********"
+            />
+            <span
+              className="password-toggle-icon ms-2"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                color: "#5a4563",
+                position: "absolute",
+                top: "30%",
+                right: "10px",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                zIndex: 10,
+                color: "#6c757d",
+              }}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
+        )}
+      </div>
+
       {loading && (
         <div className="text-center mt-2">
           <small className="text-muted">Guardando cambios...</small>

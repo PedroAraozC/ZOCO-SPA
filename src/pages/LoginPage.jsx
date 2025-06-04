@@ -9,7 +9,8 @@ import {
   FloatingLabel,
 } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import "../styles/LoginPage.css"; // Import your custom styles
+import "../styles/LoginPage.css";
+import ModalAlert from "../components/ModalAlert";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -17,6 +18,8 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +28,8 @@ function LoginPage() {
     if (result.success) {
       navigate("/dashboard");
     } else {
-      alert(result.message || "Usuario o contraseña incorrectos");
+      setModalMessage(result.message || "Usuario o contraseña incorrectos");
+      setModalVisible(true);
     }
   };
 
@@ -77,6 +81,12 @@ function LoginPage() {
           Iniciar sesión
         </Button>
       </Form>
+      <ModalAlert
+        show={modalVisible}
+        handleClose={() => setModalVisible(false)}
+        title="Error"
+        message={modalMessage}
+      />
     </Container>
   );
 }

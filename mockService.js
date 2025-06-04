@@ -79,7 +79,7 @@ export function updateUserProfile(userId, updatedData) {
 
   Object.assign(mockUsers[userIndex], updatedData, {
     id: mockUsers[userIndex].id,
-    password: mockUsers[userIndex].password,
+    // password: mockUsers[userIndex].password,
   });
 
   persist();
