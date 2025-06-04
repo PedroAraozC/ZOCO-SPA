@@ -1,338 +1,232 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Table,
+  Button,
+  Spinner,
+  Badge,
+  Alert,
+} from "react-bootstrap";
+import { getUserData, saveUserData, deleteUserData } from "../../mockService";
 import { useAuth } from "../context/AuthContext";
-import { Container, Table, Button, Badge, Card, Row, Col, Alert } from "react-bootstrap";
-import UserDataForm from "./UserDataForm";
-import { getUserData, saveUserData, deleteUserData, getDataDescription } from "../../mockService";
-import { FaPlus, FaEdit, FaTrash, FaGraduationCap, FaMapMarkerAlt, FaUser, FaRedo } from "react-icons/fa";
-import "../styles/UserDataManager.css";
+import UserDataForm from "../components/UserDataForm";
+import {
+  FaEdit,
+  FaTrash,
+  FaPlus,
+  FaGraduationCap,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
+import ModalEliminacion from "./ModalEliminacion";
 
-function UserDataManager() {
+const UserDataManager = () => {
   const { user } = useAuth();
-  const [data, setData] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [userData, setUserData] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const loadData = useCallback(async () => {
-    if (!user?.id) return;
-    
-    setLoading(true);
-    setError(null);
-    try {
-      const userData = getUserData(user.id);
-      setData([...userData]); // Crear nueva referencia para forzar re-render
-      console.log('Datos cargados para usuario', user.id, userData);
-    } catch (error) {
-      console.error("Error loading data:", error);
-      setError("Error al cargar los datos");
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.id]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    try {
+      const data = getUserData(user.id);
+      setUserData(data);
+    } catch (err) {
+      console.error("Error al cargar datos del usuario:", err);
+      setError("Error al cargar los datos del usuario");
+    }
+  }, [user.id]);
 
   const handleAdd = () => {
-    setSelected({ type: "estudio" }); // Valor por defecto
+    setSelected({ type: "estudio" });
     setShowModal(true);
   };
 
   const handleEdit = (item) => {
-    setSelected({ ...item }); // Crear copia para evitar mutaciones
+    setSelected({ ...item });
     setShowModal(true);
   };
 
-  const handleDelete = async (itemId) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este elemento?")) {
-      setActionLoading(true);
-      try {
-        const success = deleteUserData(user.id, itemId);
-        if (success) {
-          // Actualizar estado local inmediatamente
-          setData(prevData => prevData.filter(item => item.id !== itemId));
-          console.log('Elemento eliminado:', itemId);
-        } else {
-          throw new Error('Error al eliminar el elemento');
-        }
-      } catch (error) {
-        console.error("Error deleting data:", error);
-        setError("Error al eliminar el elemento");
-        // Recargar datos en caso de error
-        await loadData();
-      } finally {
-        setActionLoading(false);
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+    setActionLoading(true);
+    try {
+      const success = deleteUserData(user.id, itemToDelete.id);
+      if (success) {
+        setUserData((prev) =>
+          prev.filter((item) => item.id !== itemToDelete.id)
+        );
+      } else {
+        throw new Error();
       }
+    } catch {
+      setError("Error al eliminar el elemento");
+    } finally {
+      setActionLoading(false);
+      setShowDeleteModal(false);
+      setItemToDelete(null);
     }
   };
 
-  const handleSave = async (newEntry) => {
+  const handleSave = (newEntry) => {
     setActionLoading(true);
     try {
-      const savedEntry = saveUserData(user.id, newEntry);
-      console.log('Elemento guardado:', savedEntry);
-      
-      // Actualizar estado local inmediatamente
-      if (newEntry.id) {
-        // Actualización de elemento existente
-        setData(prevData => 
-          prevData.map(item => 
-            item.id === newEntry.id ? savedEntry : item
-          )
-        );
-      } else {
-        // Nuevo elemento
-        setData(prevData => [...prevData, savedEntry]);
-      }
-      
+      const saved = saveUserData(user.id, newEntry);
+      setUserData((prev) => {
+        const exists = prev.some((item) => item.id === newEntry.id);
+        return exists
+          ? prev.map((item) => (item.id === newEntry.id ? saved : item))
+          : [...prev, saved];
+      });
       setShowModal(false);
       setSelected(null);
-    } catch (error) {
-      console.error("Error saving data:", error);
+    } catch {
       setError("Error al guardar el elemento");
-      // Recargar datos en caso de error
-      await loadData();
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleClose = () => {
-    setShowModal(false);
-    setSelected(null);
-  };
-
-  const getTypeIcon = (type) => {
-    return type === "estudio" ? (
-      <FaGraduationCap className="text-primary" />
-    ) : (
-      <FaMapMarkerAlt className="text-danger" />
-    );
-  };
-
-  const getTypeBadge = (type) => {
-    return type === "estudio" ? (
-      <Badge bg="primary" className="type-badge">
-        <FaGraduationCap className="me-1" />
-        Estudio
-      </Badge>
-    ) : (
-      <Badge bg="danger" className="type-badge">
-        <FaMapMarkerAlt className="me-1" />
-        Dirección
-      </Badge>
-    );
-  };
-
-  const getDetailedDescription = (item) => {
+  const renderDescription = (item) => {
     if (item.type === "estudio") {
       const { institution, degree, status } = item.data;
       return (
-        <div className="detailed-description">
-          <div className="degree-title">{degree}</div>
-          <div className="institution-info">{institution}</div>
-          <Badge 
-            bg={status === "completado" ? "success" : status === "en_curso" ? "info" : "warning"}
-            className="status-badge"
+        <>
+          <div>
+            <strong>{degree}</strong>
+          </div>
+          <div className="text-muted">{institution}</div>
+          <Badge
+            bg={
+              status === "completado"
+                ? "success"
+                : status === "en_curso"
+                ? "info"
+                : "warning"
+            }
+            className="mt-1"
           >
-            {status === "completado" ? "Completado" : 
-             status === "en_curso" ? "En Curso" : 
-             status === "pausado" ? "Pausado" : "Abandonado"}
+            {status.charAt(0).toUpperCase() + status.slice(1).replace("_", " ")}
           </Badge>
-        </div>
+        </>
       );
     } else {
       const { street, city, province, addressType } = item.data;
       return (
-        <div className="detailed-description">
-          <div className="address-title">{street}</div>
-          <div className="location-info">{city}, {province}</div>
-          <Badge bg="secondary" className="status-badge">
-            {addressType === "personal" ? "Personal" : 
-             addressType === "laboral" ? "Laboral" : 
-             addressType === "familiar" ? "Familiar" : "Otro"}
+        <>
+          <div>
+            <strong>{street}</strong>
+          </div>
+          <div className="text-muted">
+            {city}, {province}
+          </div>
+          <Badge bg="secondary" className="mt-1">
+            {addressType.charAt(0).toUpperCase() + addressType.slice(1)}
           </Badge>
-        </div>
+        </>
       );
     }
   };
 
-  if (loading) {
-    return (
-      <Container className="loading-container">
-        <div className="text-center">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </div>
-          <p className="mt-2">Cargando datos del usuario...</p>
-        </div>
-      </Container>
-    );
-  }
-
-  if (!user) {
-    return (
-      <Container className="mt-4">
-        <Alert variant="warning">
-          No se pudo cargar la información del usuario.
-        </Alert>
-      </Container>
-    );
-  }
-
   return (
-    <Container className="mt-4 user-data-container">
+    <Container className="mt-4">
       {error && (
         <Alert variant="danger" dismissible onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
+      <div className="d-flex justify-content-between mb-3 align-items-center">
+        <h5 className="m-0">Mis Datos ({userData.length} elementos)</h5>
+        <Button
+          variant="outline"
+          style={{ color: "#2563eb", borderColor: "#2563eb" }}
+          onClick={handleAdd}
+          className="rounded px-3 py-2 py-1 border-1"
+        >
+          <FaPlus />
+        </Button>
+      </div>
 
-      {data.length > 0 && (
-        <Row className="stats-row">
-          <Col md={6}>
-            <Card className="stats-card estudios">
-              <Card.Body className="stats-card-body">
-                <FaGraduationCap size={32} className="text-primary stats-icon" />
-                <h4 className="text-primary stats-number">
-                  {data.filter(item => item.type === "estudio").length}
-                </h4>
-                <small className="stats-label">Estudios registrados</small>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col md={6}>
-            <Card className="stats-card direcciones">
-              <Card.Body className="stats-card-body">
-                <FaMapMarkerAlt size={32} className="text-danger stats-icon" />
-                <h4 className="text-danger stats-number">
-                  {data.filter(item => item.type === "direccion").length}
-                </h4>
-                <small className="stats-label">Direcciones registradas</small>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+      {userData.length === 0 ? (
+        <div className="text-center py-5">
+          <FaGraduationCap size={48} className="text-muted mb-3" />
+          <h6>No tienes datos registrados</h6>
+          <p className="text-muted">
+            Usa el botón para agregar estudios o direcciones
+          </p>
+        </div>
+      ) : (
+        <Table striped bordered hover responsive>
+          <thead>
+            <tr>
+              <th style={{ width: "120px" }}>Tipo</th>
+              <th>Información</th>
+              <th style={{ width: "120px" }}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {userData.map((item) => (
+              <tr key={item.id}>
+                <td>
+                  <Badge bg={item.type === "estudio" ? "primary" : "danger"}>
+                    {item.type === "estudio" ? (
+                      <FaGraduationCap className="me-1" />
+                    ) : (
+                      <FaMapMarkerAlt className="me-1" />
+                    )}
+                    {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                  </Badge>
+                </td>
+                <td>{renderDescription(item)}</td>
+                <td>
+                  <div className="d-flex gap-2">
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={() => handleEdit(item)}
+                    >
+                      <FaEdit />
+                    </Button>
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={() => {
+                        setItemToDelete(item);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      <FaTrash />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
-
-      <Card className="user-data-card">
-        <Card.Header className="user-data-header bg-gradient text-white">
-          <Row className="align-items-center text-dark">
-            <Col>
-              <h3 className="user-data-title">
-                <FaUser className="me-3" />
-                Mi Información Personal
-              </h3>
-              <p className="user-data-subtitle">
-                Gestiona tus estudios y direcciones
-              </p>
-            </Col>
-            <Col xs="auto">
-              <div className="d-flex gap-2">
-
-                <Button
-                  variant="light"
-                  className="add-button"
-                  onClick={handleAdd}
-                  disabled={actionLoading}
-                >
-                  <FaPlus size={20} className="text-primary" />
-                </Button>
-              </div>
-            </Col>
-          </Row>
-        </Card.Header>
-
-        <Card.Body className="p-0">
-          {data.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">
-                <FaGraduationCap size={64} />
-              </div>
-              <h5 className="empty-state-title">No tienes información registrada</h5>
-              <p className="empty-state-text">
-                Comienza agregando tus estudios o direcciones
-              </p>
-              <Button 
-                variant="primary" 
-                onClick={handleAdd}
-                className="add-info-button"
-                disabled={actionLoading}
-              >
-                <FaPlus className="me-2" />
-                Agregar Información
-              </Button>
-            </div>
-          ) : (
-            <div className="data-table-container table-responsive">
-              <Table hover className="data-table">
-                <thead>
-                  <tr>
-                    <th>Tipo</th>
-                    <th>Información</th>
-                    <th className="actions-column">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((item) => (
-                    <tr key={item.id}>
-                      <td className="type-column">
-                        {getTypeBadge(item.type)}
-                      </td>
-                      <td>
-                        {getDetailedDescription(item)}
-                      </td>
-                      <td className="actions-column">
-                        <div className="action-buttons">
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            className="action-button"
-                            onClick={() => handleEdit(item)}
-                            disabled={actionLoading}
-                          >
-                            <FaEdit size={14} />
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            className="action-button"
-                            onClick={() => handleDelete(item.id)}
-                            disabled={actionLoading}
-                          >
-                            <FaTrash size={14} />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          )}
-        </Card.Body>
-      </Card>
 
       <UserDataForm
-        setShow={handleClose}
-        showModal={showModal}
         initialData={selected}
-        setInitialData={setSelected}
         onSave={handleSave}
+        showModal={showModal}
+        setShow={() => setShowModal(false)}
+        setInitialData={setSelected}
       />
-      
-      {actionLoading && (
-        <div className="position-fixed bottom-0 end-0 p-3">
-          <div className="bg-primary text-white p-2 rounded">
-            <small>Procesando...</small>
-          </div>
-        </div>
-      )}
+
+      <ModalEliminacion
+        show={showDeleteModal}
+        onHide={() => {
+          setShowDeleteModal(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={handleDelete}
+        loading={actionLoading}
+        item={itemToDelete}
+      />
     </Container>
   );
-}
+};
 
 export default UserDataManager;

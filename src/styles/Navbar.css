@@ -6,13 +6,13 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: space-around;
+    min-width: 300px;
 }
 
 .btnPerfil {
     background-color: rgba(170, 170, 170, 0.158);
     color: black !important;
-    border: none;
-    padding: 5px 25px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -26,6 +26,7 @@
     display: flex;
     align-items: baseline;
 }
-.imgbtn{
+
+.imgbtn {
     margin-top: -5px;
 }
