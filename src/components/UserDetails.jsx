@@ -84,7 +84,6 @@ const UserDetails = ({
               >
                 <Button
                   variant="light"
-                  size="sm"
                   onClick={onAdd}
                   disabled={actionLoading}
                   className="w-50 w-sm-auto"
@@ -93,11 +92,10 @@ const UserDetails = ({
                 </Button>
                 <Button
                   variant="light"
-                  size="sm"
-                  className="w-50"
+                  className="w-50 "
                   onClick={() => setShowEditUserModal(true)}
                 >
-                  <FaPencil className=" me-2" />
+                  <FaPencil className=" me-2 " />
                   Editar Usuario
                 </Button>
               </Col>
