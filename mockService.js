@@ -1,7 +1,7 @@
-import mockData from './mockData.json';
+import mockData from "./mockData.json";
 
-const STORAGE_KEY_USERS = 'mockUsers';
-const STORAGE_KEY_USER_DATA = 'mockUserData';
+const STORAGE_KEY_USERS = "mockUsers";
+const STORAGE_KEY_USER_DATA = "mockUserData";
 
 function loadFromSessionStorage(key, fallback) {
   const stored = sessionStorage.getItem(key);
@@ -14,7 +14,9 @@ function saveToSessionStorage(key, data) {
 
 // Inicialización
 let mockUsers = loadFromSessionStorage(STORAGE_KEY_USERS, [...mockData.users]);
-let mockDataByUser = loadFromSessionStorage(STORAGE_KEY_USER_DATA, { ...mockData.userData });
+let mockDataByUser = loadFromSessionStorage(STORAGE_KEY_USER_DATA, {
+  ...mockData.userData,
+});
 
 function persist() {
   saveToSessionStorage(STORAGE_KEY_USERS, mockUsers);
@@ -24,7 +26,9 @@ function persist() {
 // ========== FUNCIONES DE AUTENTICACIÓN ==========
 export function loginUser(email, password) {
   const users = getAllUsers();
-  return users.find(u => u.email === email && u.password === password) || null;
+  return (
+    users.find((u) => u.email === email && u.password === password) || null
+  );
 }
 
 // ========== FUNCIONES DE DATOS ==========
@@ -44,7 +48,7 @@ export function saveUserData(userId, newData) {
   const list = mockDataByUser[userId];
   const newEntry = {
     ...newData,
-    id: newData.id || `${newData.type[0]}${Date.now()}`
+    id: newData.id || `${newData.type[0]}${Date.now()}`,
   };
 
   const index = list.findIndex((item) => item.id === newData.id);
@@ -87,13 +91,13 @@ export function updateUserProfile(userId, updatedData) {
 }
 
 export function createUser(userData) {
-  const newId = Math.max(...mockUsers.map(u => u.id), 0) + 1;
+  const newId = Math.max(...mockUsers.map((u) => u.id), 0) + 1;
   const newUser = {
     id: newId,
-    name: userData.name || '',
-    email: userData.email || '',
-    role: userData.role || 'user',
-    password: userData.password || 'default123',
+    name: userData.name || "",
+    email: userData.email || "",
+    role: userData.role || "user",
+    password: userData.password || "default123",
   };
 
   mockUsers.push(newUser);
@@ -131,14 +135,17 @@ export function getUserStats() {
   return {
     totalUsers: mockUsers.length,
     usersWithData: Object.keys(mockDataByUser).length,
-    totalDataEntries: Object.values(mockDataByUser).reduce((sum, arr) => sum + arr.length, 0)
+    totalDataEntries: Object.values(mockDataByUser).reduce(
+      (sum, arr) => sum + arr.length,
+      0
+    ),
   };
 }
 
 export function validateDataIntegrity() {
   const issues = [];
-  Object.keys(mockDataByUser).forEach(userId => {
-    const userExists = mockUsers.some(user => user.id === parseInt(userId));
+  Object.keys(mockDataByUser).forEach((userId) => {
+    const userExists = mockUsers.some((user) => user.id === parseInt(userId));
     if (!userExists) {
       issues.push(`Datos encontrados para usuario inexistente: ${userId}`);
     }

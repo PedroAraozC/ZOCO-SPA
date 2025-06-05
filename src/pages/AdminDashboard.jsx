@@ -46,6 +46,17 @@ const AdminDashboard = () => {
     }
   }, []);
 
+  const handleUpdateUser = (updatedUser) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((u) =>
+        u.id === updatedUser.id ? { ...u, ...updatedUser } : u
+      )
+    );
+    setSelectedUser((prev) =>
+      prev && prev.id === updatedUser.id ? { ...prev, ...updatedUser } : prev
+    );
+  };
+
   useEffect(() => {
     if (selectedUserId) {
       setLoading(true);
@@ -183,6 +194,7 @@ const AdminDashboard = () => {
                 selected={selected}
                 setSelected={setSelected}
                 actionLoading={actionLoading}
+                onUpdateUser={handleUpdateUser}
               />
             </Col>
           </Row>

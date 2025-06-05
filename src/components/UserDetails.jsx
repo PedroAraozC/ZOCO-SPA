@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Row, Col, Button, Spinner, Table, Badge } from "react-bootstrap";
 import {
   FaGraduationCap,
@@ -9,47 +9,10 @@ import {
   FaEye,
 } from "react-icons/fa";
 import UserDataForm from "./UserDataForm";
-
-const renderDescription = (item) => {
-  if (item.type === "estudio") {
-    const { institution, degree, status } = item.data;
-    return (
-      <>
-        <div>
-          <strong>{degree}</strong>
-        </div>
-        <div className="text-muted">{institution}</div>
-        <Badge
-          bg={
-            status === "completado"
-              ? "success"
-              : status === "en_curso"
-              ? "info"
-              : "warning"
-          }
-          className="mt-1"
-        >
-          {status.charAt(0).toUpperCase() + status.slice(1).replace("_", " ")}
-        </Badge>
-      </>
-    );
-  } else {
-    const { street, city, province, addressType } = item.data;
-    return (
-      <>
-        <div>
-          <strong>{street}</strong>
-        </div>
-        <div className="text-muted">
-          {city}, {province}
-        </div>
-        <Badge bg="secondary" className="mt-1">
-          {addressType.charAt(0).toUpperCase() + addressType.slice(1)}
-        </Badge>
-      </>
-    );
-  }
-};
+import { FaPencil } from "react-icons/fa6";
+import RenderDescripcion from "./RenderDescripcion";
+import ModalEditUser from "./ModalEditUser";
+import { updateUserProfile } from "../../mockService";
 
 const UserDetails = ({
   loading,
@@ -64,7 +27,26 @@ const UserDetails = ({
   selected,
   setSelected,
   actionLoading,
+  onUpdateUser,
 }) => {
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+
+  const handleSaveUser = async (updatedUser) => {
+    try {
+      console.log(updatedUser);
+      const updated = await updateUserProfile(user.id, updatedUser);
+      await updateUserProfile(user.id, updatedUser);
+      alert("Usuario actualizado correctamente");
+      setShowEditUserModal(false);
+      if (typeof onUpdateUser === "function") {
+        onUpdateUser(updated);
+      }
+    } catch (error) {
+      console.error("Error actualizando usuario:", error);
+      alert("Hubo un error al guardar los cambios");
+    }
+  };
+
   return (
     <Col>
       {!user ? (
@@ -95,15 +77,28 @@ const UserDetails = ({
                   {user?.email} - {user?.role}
                 </small>
               </Col>
-              <Col xs={12} sm={4} className="text-sm-end mt-2 mt-sm-0">
+              <Col
+                xs={12}
+                sm={4}
+                className="text-sm-end mt-2 mt-sm-0 d-flex align-items-center"
+              >
                 <Button
                   variant="light"
                   size="sm"
                   onClick={onAdd}
                   disabled={actionLoading}
-                  className="w-100 w-sm-auto"
+                  className="w-50 w-sm-auto"
                 >
                   <FaPlus className="me-2" /> Agregar Dato
+                </Button>
+                <Button
+                  variant="light"
+                  size="sm"
+                  className="w-50"
+                  onClick={() => setShowEditUserModal(true)}
+                >
+                  <FaPencil className=" me-2" />
+                  Editar Usuario
                 </Button>
               </Col>
             </Row>
@@ -148,7 +143,7 @@ const UserDetails = ({
                             item.type.slice(1)}
                         </Badge>
                       </td>
-                      <td>{renderDescription(item)}</td>
+                      <td>{RenderDescripcion(item)}</td>
                       <td>
                         <div className="d-flex gap-2">
                           <Button
@@ -175,7 +170,12 @@ const UserDetails = ({
               </Table>
             )}
           </Card.Body>
-
+          <ModalEditUser
+            show={showEditUserModal}
+            onHide={() => setShowEditUserModal(false)}
+            user={user}
+            onSave={handleSaveUser}
+          />
           <UserDataForm
             initialData={selected}
             onSave={onSave}
