@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import {
-  Container,
-  Form,
-  Button,
-  InputGroup,
-  FloatingLabel,
-} from "react-bootstrap";
+import { Container, Form, Button, FloatingLabel } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "../styles/LoginPage.css";
-import ModalAlert from "../components/ModalAlert";
+import { toast } from "react-toastify";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,18 +12,31 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await login({ email, password });
-
-    if (result.success) {
-      navigate("/dashboard");
-    } else {
-      setModalMessage(result.message || "Usuario o contraseña incorrectos");
-      setModalVisible(true);
+    try {
+      const result = await login({ email, password });
+      if (result.success) {
+        toast.success(
+          `¡Inicio de sesión exitoso! Bienvenid@ ${result.foundUser.name}!`,
+          {
+            autoClose: 2000,
+          }
+        );
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 100);
+      } else {
+        toast.error(result.message || "Usuario o contraseña incorrectos", {
+          autoClose: 5000,
+        });
+      }
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error("Error de conexión. Intenta nuevamente.", {
+        autoClose: 5000,
+      });
     }
   };
 
@@ -81,12 +88,6 @@ function LoginPage() {
           Iniciar sesión
         </Button>
       </Form>
-      <ModalAlert
-        show={modalVisible}
-        handleClose={() => setModalVisible(false)}
-        title="Error"
-        message={modalMessage}
-      />
     </Container>
   );
 }

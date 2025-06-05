@@ -18,6 +18,7 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import ModalEliminacion from "./ModalEliminacion";
+import { toast } from "react-toastify";
 
 const UserDataManager = () => {
   const { user } = useAuth();
@@ -55,6 +56,9 @@ const UserDataManager = () => {
     try {
       const success = deleteUserData(user.id, itemToDelete.id);
       if (success) {
+        toast.success(`${itemToDelete.type} Se eliminó correctamente`, {
+          autoClose: 2000,
+        });
         setUserData((prev) =>
           prev.filter((item) => item.id !== itemToDelete.id)
         );

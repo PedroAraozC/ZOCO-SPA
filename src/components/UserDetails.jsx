@@ -13,6 +13,7 @@ import { FaPencil } from "react-icons/fa6";
 import RenderDescripcion from "./RenderDescripcion";
 import ModalEditUser from "./ModalEditUser";
 import { updateUserProfile } from "../../mockService";
+import { toast } from "react-toastify";
 
 const UserDetails = ({
   loading,
@@ -33,17 +34,21 @@ const UserDetails = ({
 
   const handleSaveUser = async (updatedUser) => {
     try {
-      console.log(updatedUser);
+      console.log(updatedUser, "qeqwe");
       const updated = await updateUserProfile(user.id, updatedUser);
       await updateUserProfile(user.id, updatedUser);
-      alert("Usuario actualizado correctamente");
+      toast.success(`Usuario actualizado ${user.name} correctamente!`, {
+        autoClose: 2000,
+      });
       setShowEditUserModal(false);
       if (typeof onUpdateUser === "function") {
         onUpdateUser(updated);
       }
     } catch (error) {
       console.error("Error actualizando usuario:", error);
-      alert("Hubo un error al guardar los cambios");
+      toast.error("Hubo un error al guardar los cambios.", {
+        autoClose: 5000,
+      });
     }
   };
 
@@ -88,7 +93,8 @@ const UserDetails = ({
                   disabled={actionLoading}
                   className="w-50 w-sm-auto"
                 >
-                  <FaPlus className="me-2" /> Agregar Dato
+                  <FaPlus className="me-2" />
+                  {/* Agregar Dato */}
                 </Button>
                 <Button
                   variant="light"
@@ -96,7 +102,7 @@ const UserDetails = ({
                   onClick={() => setShowEditUserModal(true)}
                 >
                   <FaPencil className=" me-2 " />
-                  Editar Usuario
+                  {/* Editar Usuario */}
                 </Button>
               </Col>
             </Row>

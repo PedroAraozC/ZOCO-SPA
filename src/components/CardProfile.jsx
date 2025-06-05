@@ -6,9 +6,10 @@ import { FaEye, FaEyeSlash, FaPencil } from "react-icons/fa6";
 import { FaSave, FaTimes } from "react-icons/fa";
 import { updateUserProfile, getUserInfo } from "../../mockService";
 import { Form, FormControl } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 const CardProfile = () => {
-  const { user, updateUserContext } = useAuth(); // Necesitas agregar updateUserContext al contexto
+  const { user, updateUserContext } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({
     name: user?.name || "",
@@ -19,7 +20,6 @@ const CardProfile = () => {
   const [loading, setSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Sincronizar el estado local cuando el usuario cambie
   useEffect(() => {
     if (user) {
       setEditedUser({
@@ -39,19 +39,19 @@ const CardProfile = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Actualizar en mockUsers
       const success = updateUserProfile(user.id, editedUser);
 
       if (success) {
-        // Obtener los datos actualizados
         const updatedUser = getUserInfo(user.id);
 
-        // Actualizar el contexto de autenticación
         if (updateUserContext && updatedUser) {
           updateUserContext(updatedUser);
         }
 
-        console.log("Perfil actualizado exitosamente:", updatedUser);
+        // console.log("Perfil actualizado exitosamente:", updatedUser);
+        toast.success(`Perfil actualizado correctamente!`, {
+          autoClose: 2000,
+        });
         setIsEditing(false);
       } else {
         console.error("Error al actualizar el perfil");
@@ -72,8 +72,6 @@ const CardProfile = () => {
     });
     setIsEditing(false);
   };
-
-  // Mostrar loading si no hay usuario
   if (!user) {
     return (
       <div className="card">
@@ -184,12 +182,6 @@ const CardProfile = () => {
           </div>
         )}
       </div>
-
-      {loading && (
-        <div className="text-center mt-2">
-          <small className="text-muted">Guardando cambios...</small>
-        </div>
-      )}
     </div>
   );
 };

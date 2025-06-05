@@ -15,6 +15,7 @@ import {
   FaSave,
   FaTimes,
 } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const UserDataForm = ({
   setShow,
@@ -24,6 +25,8 @@ const UserDataForm = ({
   onSave,
 }) => {
   const [type, setType] = useState(initialData?.type || "estudio");
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     institution: "",
     degree: "",
@@ -37,8 +40,6 @@ const UserDataForm = ({
     country: "Argentina",
     addressType: "personal",
   });
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (initialData?.id) {
@@ -82,9 +83,15 @@ const UserDataForm = ({
     setIsSubmitting(true);
     try {
       await onSave({ id: initialData?.id, type, data: formData });
+      toast.success(`¡Se agregó ${type} con éxito!`, {
+        autoClose: 2000,
+      });
       setShow(false);
     } catch (error) {
       console.error("Error al guardar:", error);
+      toast.error(result.message || "Algo salió mal :(", {
+        autoClose: 5000,
+      });
     } finally {
       setIsSubmitting(false);
       setInitialData(null);

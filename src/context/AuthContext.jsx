@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
       setUser(foundUser);
       sessionStorage.setItem('token', fakeToken);
       sessionStorage.setItem('user', JSON.stringify(foundUser));
-      return { success: true };
+      return { success: true, foundUser };
     }
     return { success: false, message: 'Credenciales inválidas' };
   };
